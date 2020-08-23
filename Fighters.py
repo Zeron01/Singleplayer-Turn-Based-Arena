@@ -337,10 +337,4 @@ def main():
         printStats(standings)
     return
 
-x=0
-y = player("Jotaro")
-z = player("Dio")
-levelAdd([y,z],100)
-while x<=100:
-    combat(y,z)
-    recoverAll([y,z])
+main()
