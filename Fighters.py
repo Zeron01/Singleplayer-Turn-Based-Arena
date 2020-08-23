@@ -26,7 +26,7 @@ class player:
             self.maxHealth = self.health
             self.exp -= self.expMax
             self.expMax+=50
-            self.defense=round(((self.level**1.45)/2)*(10/self.level**1.2))*2
+            self.defense+=10
     def dodge(self):
         x = random.choice([True,False,False,False,False,False,False,False])
         return x
@@ -39,7 +39,7 @@ class player:
         self.health = self.maxHealth
     def critical(self,other):
         x = [True,False,False,False,False,False,False,False]
-        if self.level%other.level >= 10:
+        if self.level-other.level >= 10:
             x.pop(-1)
             x.pop(-1)
             x.pop(-1)
@@ -144,10 +144,6 @@ def characterCreation():
             creators.append(player("Dev"))
             creators.append(player("Raghav"))
             creators.append(player("Slade"))
-            # creators.append(player("Tashan"))
-            # creators.append(player("Balraj"))
-            # creators.append(player("Amit"))
-            # creators.append(player("Vraj"))
             alphalinewriter(["Adding Nirojan","Adding Dev","Adding Raghav","Adding Slade"])
             print("")
             time.sleep(4)
@@ -166,7 +162,7 @@ def criticalQuotes(player):
     if player.name == 'Dio':
         return random.choice(["ZA WARUDO","ROAD A ROLLAR DAH","WRYYYYY","KISAMAAAAA","Ohoho, you dare approach me?","Hinjaku! Hinjaku!","It Was me, Dio!","Muda! Muda! Muda! Muda! Muda!","Good bye Jojo"])
     elif player.name == 'Jotaro':
-        return random.choice(['Yare yare daze',"STAR PLATIUNUM","Here's your receipt","Your crime can't be paid with money"])
+        return random.choice(['Yare yare daze',"STAR PLATIUNUM","Here's your receipt","Your crime can't be paid with money","JAGARS"])
     dialogue = ["One of us has to die","I'll have your head","I'll keep it simple","Pick a god and pray...","I didn't want to do this...","You're already dead.","I promise you this will hurt","Don't waste my time.","I'll promise a swift death","Any last words?","Pay with your life","You're not worth my time","Start booking your funeral","Tell Satan I'm waiting","Just so you know, this isn't personal","Nothing personal kid","Don't take this personal","I'll make this quick","No one to save you now..."]
     return random.choice(dialogue)
 def criticalCheck(check):
@@ -175,10 +171,10 @@ def criticalCheck(check):
     else:
         return ''
 def deathQuotes(player):
-    dialogue = ["Not like this","NOOOOOOOOOOO","Impossible....","I...I never thought you'd be this good...","To end... like this?","What? Huh? What's happening?","NO! No, no, no!","No, no, no... I can't die like this","I'm sorry...","Why now....?","I was so close","I failed my family...","Goodbye...","..."]
+    dialogue = ["Not like this","NOOOOOOOOOOO","Impossible....","I...I never thought you'd be this good...","To end... like this?","What? Huh? What's happening?","NO! No, no, no!","No, no, no... I can't die like this",f"I'm sorry{random.choice([' mother...',' father...'])}","Why now....?","I was so close","I failed my family...","Goodbye...","..."]
     return random.choice(dialogue)
 def dodgeQuotes(player):
-    dialogue = ["You fool","Not even close", "Too slow", "I saw that from a mile away","You think that was going to hit me??","Miss me with that?","PIKACHU USE DODGE","was that ur best?","even my grandma could dodge that","you call that an attack?","are you even trying to hurt me?","Please...like that would ever hit me"]
+    dialogue = ["You fool","Not even close", "Too slow", "I saw that from a mile away","You think that was going to hit me??","Miss me with that?","PIKACHU USE DODGE","was that ur best?","even my grandma could dodge that","you call that an attack?","are you even trying to hurt me?","Please...like that would ever hit me",f"I can be {random.choice(['sleeping','blind','crippled','disabled','knocked out','drunk','chained'])} and you still can't hit me"]
     return random.choice(dialogue)  
 #Combat Code for specifically one person
 
@@ -199,14 +195,14 @@ def attack(player,other,turn):
                     lineWriter(f'{player.name} equips {player.primary.name} (Damage: {formatComma(player.primary.damage)}, Durability: {formatComma(player.primary.durability)}/{formatComma(player.primary.maxDurability)})')
                     time.sleep(0.5)
             damage = player.primary.use(player)
-    damage += ((player.level*30)-round(other.defense/4)) + (random.randint(0,10*player.level))
+    damage += ((player.level*15)-other.defense) + (random.randint(1,5*player.level))
     if player.critical(other):
         if other.name != 'Dummy' and player.name!= 'Dummy':
             lineWriter(f'{player.name}: {criticalQuotes(player)}',0.05)
             #lineWriter(f"{player.name} begins charging his attack...",0.032)
             time.sleep(0.5)
         criticalHit = True
-        damage = round(abs(damage*1.5))
+        damage = round(abs(damage*2))
     if other.dodge():
         if other.name != 'Dummy' and player.name!= 'Dummy':
             lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.0025)
@@ -276,9 +272,18 @@ def tournament(fighters):
     rounds = 1
     eliminated = []
     while True:
-        lineWriter(f"Round {rounds}\n")
+        
         x = 0
         start = rounds
+        if rounds == 1:
+
+            for y in fighters:
+                lineWriter(str(y),0.001)
+            time.sleep(1)
+            lineWriter("Let the games begin...\n",0.064)
+            time.sleep(2)
+            os.system('cls')
+        lineWriter(f"Round {rounds}\n")
         while start == rounds:
             fighter1 = fighters[x]
             fighter2 = fighters[x+1]
@@ -326,15 +331,16 @@ def main():
                     break
             except:
                 lineWriter("Please enter a valid input")
-            
-    os.system('cls')
-    lineWriter("The real game will now begin (Correct Q3 on final)")
-    time.sleep(2)
     os.system('cls')
     standings = tournament(fighters)
     if standings != 0:
         printStats(standings)
     return
 
-
-main()
+x=0
+y = player("Jotaro")
+z = player("Dio")
+levelAdd([y,z],100)
+while x<=100:
+    combat(y,z)
+    recoverAll([y,z])
