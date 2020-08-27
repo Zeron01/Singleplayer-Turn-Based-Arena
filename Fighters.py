@@ -17,16 +17,23 @@ class player:
         self.defense = defense
         self.killer = "None"
         self.primary = item("Nothing",0,0)
-    def levelup(self,noprint=False):
+    def levelup(self,addlevel=1):
+        if addlevel!=1:
+            self.expMax = 50 *(addlevel+1)
+            self.level = addlevel
+            self.health = self.level*100
+            self.maxHealth = self.health
+            self.exp = 0
+            self.defense=5*self.level
+            return
         while self.exp >= self.expMax:
-            if noprint == False:
-                print(f'\n{self.name} has leveled up to {formatComma(self.level+1)}') 
+            print(f'\n{self.name} has leveled up to {formatComma(self.level+1)}') 
             self.level+=1
             self.health = self.level*100
             self.maxHealth = self.health
             self.exp -= self.expMax
             self.expMax+=50
-            self.defense+=10
+            self.defense+=5
     def dodge(self):
         x = random.choice([True,False,False,False,False,False,False,False])
         return x
@@ -111,23 +118,24 @@ def grindLvl(fighters):
             #     time.sleep(0.5)
             recoverAll([fighter])
     return fighters
-def addExp(fighters,exp):
+def addExp(fighters,exp,level):
     for fighter in fighters:
         fighter.exp+=exp
-        fighter.levelup(True)
+        fighter.levelup(level)
 def levelAdd(fighters,levelDesired):
     if levelDesired>=1:
         for fighter in fighters:
             x = round(50*(levelDesired*(levelDesired+1)/2))
             x-=50
-            addExp([fighter],x)
+            addExp([fighter],x,levelDesired)
 
-def lineWriter(text,delay = 0.004):
+def lineWriter(text,delay = 0.004,noLine = False):
     for letter in text:
         print(letter,end='')
         sys.stdout.flush()
         time.sleep(delay)
-    print("")    
+    if noLine ==False:
+        print("")    
 def printStats(fighters):
     for fighter in fighters:
         lineWriter(str(fighter))
@@ -136,8 +144,8 @@ def formatComma(number):
 def characterCreation():
     creators = []
     x = ''
-    print("Enter your fighters names (Type 'n' to stop)")
-    while x != 'n' and len(creators)<4:
+    print("Enter your fighters names (Type 'stop' to stop)")
+    while x != 'stop' and len(creators)<32:
         x = input(">")
         if x =='tester':
             creators.append(player("Nirojan"))
@@ -149,10 +157,10 @@ def characterCreation():
             time.sleep(4)
             return creators
         else:
-            if x !='n':
+            if x !='stop' and x!=' ':
                 x = player(x)
                 creators.append(x)
-                lineWriter(str(x))
+                #lineWriter(str(x))
     return creators
 
 #Combat code
@@ -163,7 +171,13 @@ def criticalQuotes(player):
         return random.choice(["ZA WARUDO","ROAD A ROLLAR DAH","WRYYYYY","KISAMAAAAA","Ohoho, you dare approach me?","Hinjaku! Hinjaku!","It Was me, Dio!","Muda! Muda! Muda! Muda! Muda!","Good bye Jojo"])
     elif player.name == 'Jotaro':
         return random.choice(['Yare yare daze',"STAR PLATIUNUM","Here's your receipt","Your crime can't be paid with money","JAGARS"])
-    dialogue = ["One of us has to die","I'll have your head","I'll keep it simple","Pick a god and pray...","I didn't want to do this...","You're already dead.","I promise you this will hurt","Don't waste my time.","I'll promise a swift death","Any last words?","Pay with your life","You're not worth my time","Start booking your funeral","Tell Satan I'm waiting","Just so you know, this isn't personal","Nothing personal kid","Don't take this personal","I'll make this quick","No one to save you now..."]
+    dialogue = [
+    "One of us has to die...","You will not live to see another day","I'll keep it simple",
+    "Pick a god and pray...","I didn't want to do this...","You're already dead.","I promise you won't leave in one piece",
+    "Don't waste my time.","I'll promise a swift death","Any last words?","Pay with your life","You're not worth my time",
+    "Start booking your funeral","I'll send you to hell","Just so you know, this isn't personal",
+    "Nothing personal kid","Don't take this personal","I'll make this quick","No one to save you now","Losing my patience",
+    "Pathetic","It didn't have to be this way"]
     return random.choice(dialogue)
 def criticalCheck(check):
     if check == True:
@@ -272,11 +286,8 @@ def tournament(fighters):
     rounds = 1
     eliminated = []
     while True:
-        
-        x = 0
         start = rounds
         if rounds == 1:
-
             for y in fighters:
                 lineWriter(str(y),0.001)
             time.sleep(1)
@@ -285,16 +296,16 @@ def tournament(fighters):
             os.system('cls')
         lineWriter(f"Round {rounds}\n")
         while start == rounds:
-            fighter1 = fighters[x]
-            fighter2 = fighters[x+1]
+            fighter1 = fighters[0]
+            fighter2 = fighters[1]
             winner = combat(fighter1,fighter2)
             winners.append(winner)
             if fighter1 != winner:
                 eliminated.append(fighter1)
             else:
                 eliminated.append(fighter2)
-            fighters.pop(x)
-            fighters.pop(x)
+            fighters.pop(0)
+            fighters.pop(0)
             if len(fighters) == 0 and len(winners) >= 2:
                 for fighter in winners:
                     fighters.append(fighter)
@@ -305,7 +316,7 @@ def tournament(fighters):
                 lineWriter(f"Winner of tournmanet is: {winner.name}")
                 eliminated.append(winners[0])
                 return eliminated
-            lineWriter(f"Up next: Level {formatComma(fighters[x].level)} {fighters[x].name} vs Level {formatComma(fighters[x+1].level)} {fighters[x+1].name}\n")
+            lineWriter(f"Up next: Level {formatComma(fighters[0].level)} {fighters[0].name} vs Level {formatComma(fighters[1].level)} {fighters[1].name}\n")
             time.sleep(5)
 
 #Main function
@@ -338,3 +349,6 @@ def main():
     return
 
 main()
+
+
+
