@@ -73,13 +73,13 @@ class player:
         other.health-=damage
         
         if (not other.alive()):
-            player.exp+=other.level * 50
+            player.exp+=other.level * 50+50
             if other.name != 'Dummy' and player.name!= 'Dummy':
                 print("")
                 lineWriter(f'{other.name}: {deathQuotes(other)}',0.05)
                 time.sleep(0.25)
                 lineWriter(f'{other.name} has fallen\n',0.1)
-                lineWriter(f'{player.name} gains {formatComma(other.level*50)} exp!' )
+                lineWriter(f'{player.name} gains {formatComma(other.level*50+50)} exp!' )
             player.levelup()
             other.killer = player
         if used == True and player.primary.durability<=0:
@@ -129,7 +129,8 @@ class player:
 
         text = (f"Profile: {self.name}\n\nLevel: {formatComma(self.level)}\nHealth: {formatComma(self.health)}/{formatComma(self.maxHealth)}\nDefense: {formatComma(self.defense)}\nExp: {formatComma(self.exp)}/{formatComma(self.expMax)}\nWins: {formatComma(self.wins)}\nInventory: [")
         if self.hasItem():
-            text+=self.listItems()+']\n'
+            text+=self.listItems()
+        text+=']\n'
         if not self.alive():
             deadtext = (f"\nStatus: Dead, killed by Level {formatComma(self.killer.level)} {self.killer.name}")
             text+=deadtext
@@ -212,12 +213,12 @@ def characterCreation():
         if x =='tester':
             creators.append(player("Nirojan"))
             creators.append(player("Dev"))
-            creators.append(player("Raghav"))
-            creators.append(player("Slade"))
+            # creators.append(player("Raghav"))
+            # creators.append(player("Slade"))
             alphalinewriter(["Adding Nirojan","Adding Dev","Adding Raghav","Adding Slade"])
             for x in creators:
                 x.addItem(item("Phoenix Slayer",50,50,1))
-                x.addItem(item("ShotGun",20,50,1))
+                x.addItem(item("Shotgun",20,50,1))
                 x.addItem(item("Excalibur",100,100,1))
                 x.addItem(item("Sniper",200,60,1))
             print("")
