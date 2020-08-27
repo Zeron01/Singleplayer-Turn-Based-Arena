@@ -34,16 +34,56 @@ class player:
             self.exp -= self.expMax
             self.expMax+=50
             self.defense+=5
-    def dodge(self):
-        x = random.choice([True,False,False,False,False,False,False,False])
-        return x
-    def alive(self):
-        if self.health <=0:
-            self.health = 0
-            return False
-        return True
-    def restorehealth(self):
-        self.health = self.maxHealth
+    def attack(self,other,turn):
+        player = self
+        lineWriter(f'->[{player.name}\'s turn]<-\n')
+        time.sleep(0.45)
+        damage = 0
+        criticalHit = False
+        used = False
+        if player.hasItem():
+            if player.canUse():
+                if other.name != 'Dummy' and player.name!= 'Dummy':
+                    if player.primary.durability==player.primary.maxDurability or turn == 1:
+                        lineWriter(f'{player.name} equips {player.primary.name} (Damage: {formatComma(player.primary.damage)}, Durability: {formatComma(player.primary.durability)}/{formatComma(player.primary.maxDurability)})')
+                        time.sleep(0.5)
+                damage = player.primary.use(player)
+                used = True
+        
+        damage += ((player.level*15)-other.defense) + (random.randint(1,5*player.level))
+        if player.critical(other):
+            if other.name != 'Dummy' and player.name!= 'Dummy':
+                lineWriter(f'{player.name}: {criticalQuotes(player)}',0.05)
+                time.sleep(0.5)
+            criticalHit = True
+            damage = round(abs(damage*2))
+        if other.dodge():
+            if other.name != 'Dummy' and player.name!= 'Dummy':
+                lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.0025)
+                lineWriter(f'{other.name} dodges a{criticalCheck(criticalHit)} strike from {player.name}')
+                time.sleep(0.5)
+            if used == True and player.primary.durability<=0:
+                lineWriter(f'{self.name}\'s {self.primary.name} has been broken...',0.032)
+            return
+        if damage < 0:
+            damage = 1
+        if other.name != 'Dummy' and player.name!= 'Dummy':
+            lineWriter(f'[{formatComma(player.health)}/{formatComma(player.maxHealth)} HP] {player.name} deals {formatComma(damage)}{criticalCheck(criticalHit)} damage to {other.name} [{formatComma(other.health)}/{formatComma(other.maxHealth)} HP] ')
+
+        other.health-=damage
+        
+        if (not other.alive()):
+            player.exp+=other.level * 50
+            if other.name != 'Dummy' and player.name!= 'Dummy':
+                print("")
+                lineWriter(f'{other.name}: {deathQuotes(other)}',0.05)
+                time.sleep(0.25)
+                lineWriter(f'{other.name} has fallen\n',0.1)
+                lineWriter(f'{player.name} gains {formatComma(other.level*50)} exp!' )
+            player.levelup()
+            other.killer = player
+        if used == True and player.primary.durability<=0:
+            lineWriter(f'{self.name}\'s {self.primary.name} has been broken...',0.032)
     def critical(self,other):
         x = [True,False,False,False,False,False,False,False]
         if self.level-other.level >= 10:
@@ -54,15 +94,42 @@ class player:
             x.pop(-1)
             x.pop(-1)
         x = random.choice(x)
+        return x 
+    def dodge(self):
+        x = random.choice([True,False,False,False,False,False,False,False])
         return x
+    def alive(self):
+        if self.health <=0:
+            self.health = 0
+            return False
+        return True
+    def restorehealth(self):
+        self.health = self.maxHealth
     def canUse(self):
         if self.level>=self.primary.lvlReq and not self.primary.isBroken():
             return True
         return False
+    def hasItem(self):
+        if self.inventory!=[]:
+            for x in self.inventory:
+                if not x.isBroken():
+                    self.primary=x
+                    return True
+            return True
+        return False
+    def addItem(self,item):
+        self.inventory.append(item)
+    def listItems(self):
+        listofItems = ''
+        for x in self.inventory:
+            listofItems+=x.isBroken(True)+x.name+', '
+        return listofItems[0:len(listofItems)-2]
     def __str__(self):
         print("\n------------------------------")
 
-        text = (f"Profile: {self.name}\n\nLevel: {formatComma(self.level)}\nHealth: {formatComma(self.health)}/{formatComma(self.maxHealth)}\nDefense: {formatComma(self.defense)}\nExp: {formatComma(self.exp)}/{formatComma(self.expMax)}\nWins: {formatComma(self.wins)}\n")
+        text = (f"Profile: {self.name}\n\nLevel: {formatComma(self.level)}\nHealth: {formatComma(self.health)}/{formatComma(self.maxHealth)}\nDefense: {formatComma(self.defense)}\nExp: {formatComma(self.exp)}/{formatComma(self.expMax)}\nWins: {formatComma(self.wins)}\nInventory: [")
+        if self.hasItem():
+            text+=self.listItems()+']\n'
         if not self.alive():
             deadtext = (f"\nStatus: Dead, killed by Level {formatComma(self.killer.level)} {self.killer.name}")
             text+=deadtext
@@ -71,13 +138,6 @@ class player:
             text+=alivetext
         text+=("\n------------------------------")
         return text
-    def hasItem(self):
-        if self.inventory!=[]:
-            self.primary = self.inventory[0]
-            return True
-        return False
-    def addItem(self,item):
-        self.inventory.append(item)
 class item:
     def __init__(self,name="None",damage=0,durability=0,lvlReq=1):
         self.name = name
@@ -88,15 +148,17 @@ class item:
     def use(self,user):
         if not self.isBroken() and user.level>=self.lvlReq:
             self.durability-=10
-            if self.durability<=0:
-                print(f'!!{self.name} has one use left!!')
             return self.damage
         return 0
 
         return self.damage
-    def isBroken(self):
+    def isBroken(self,display = False):
         if self.durability <=0:
+            if display == True:
+                return 'Broken '
             return True
+        if display == True:
+            return ''
         return False
     def repairItem(self):
         self.durability = self.maxDurability
@@ -153,6 +215,11 @@ def characterCreation():
             creators.append(player("Raghav"))
             creators.append(player("Slade"))
             alphalinewriter(["Adding Nirojan","Adding Dev","Adding Raghav","Adding Slade"])
+            for x in creators:
+                x.addItem(item("Phoenix Slayer",50,50,1))
+                x.addItem(item("ShotGun",20,50,1))
+                x.addItem(item("Excalibur",100,100,1))
+                x.addItem(item("Sniper",200,60,1))
             print("")
             time.sleep(4)
             return creators
@@ -162,7 +229,11 @@ def characterCreation():
                 creators.append(x)
                 #lineWriter(str(x))
     return creators
-
+def teamCreation(name,fighters):
+    levels = 0
+    for x in fighters:
+        levels+=x.level
+    return player(name,100*levels,levels,0,0,5*levels)
 #Combat code
 
 #Various quotes depending on the damage/death/dodge rates
@@ -190,57 +261,6 @@ def deathQuotes(player):
 def dodgeQuotes(player):
     dialogue = ["You fool","Not even close", "Too slow", "I saw that from a mile away","You think that was going to hit me??","Miss me with that?","PIKACHU USE DODGE","was that ur best?","even my grandma could dodge that","you call that an attack?","are you even trying to hurt me?","Please...like that would ever hit me",f"I can be {random.choice(['sleeping','blind','crippled','disabled','knocked out','drunk','chained'])} and you still can't hit me"]
     return random.choice(dialogue)  
-#Combat Code for specifically one person
-
-def attack(player,other,turn):
-    # if other.dodge():
-    #     if other.name != 'Dummy' and player.name!= 'Dummy':
-    #         lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.0025)
-    #         lineWriter(f'[{formatComma(other.health)}/{formatComma(other.maxHealth)} HP] {other.name} dodges a strike from {player.name} [{formatComma(player.health)}/{formatComma(player.maxHealth)} HP] ')
-    #         time.sleep(0.5)
-    #     return
-    damage = 0
-    criticalHit = False
-    if player.hasItem():
-        if player.canUse():
-            if other.name != 'Dummy' and player.name!= 'Dummy':
-                if turn == 1:
-
-                    lineWriter(f'{player.name} equips {player.primary.name} (Damage: {formatComma(player.primary.damage)}, Durability: {formatComma(player.primary.durability)}/{formatComma(player.primary.maxDurability)})')
-                    time.sleep(0.5)
-            damage = player.primary.use(player)
-    damage += ((player.level*15)-other.defense) + (random.randint(1,5*player.level))
-    if player.critical(other):
-        if other.name != 'Dummy' and player.name!= 'Dummy':
-            lineWriter(f'{player.name}: {criticalQuotes(player)}',0.05)
-            #lineWriter(f"{player.name} begins charging his attack...",0.032)
-            time.sleep(0.5)
-        criticalHit = True
-        damage = round(abs(damage*2))
-    if other.dodge():
-        if other.name != 'Dummy' and player.name!= 'Dummy':
-            lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.0025)
-            #lineWriter(f'[{formatComma(other.health)}/{formatComma(other.maxHealth)} HP] {other.name} dodges a{criticalCheck(criticalHit)} strike from {player.name} [{formatComma(player.health)}/{formatComma(player.maxHealth)} HP] ')
-            lineWriter(f'{other.name} dodges a{criticalCheck(criticalHit)} strike from {player.name}')
-            time.sleep(0.5)
-        return
-    if damage < 0:
-        damage = 1
-    if other.name != 'Dummy' and player.name!= 'Dummy':
-        lineWriter(f'[{formatComma(player.health)}/{formatComma(player.maxHealth)} HP] {player.name} deals {formatComma(damage)}{criticalCheck(criticalHit)} damage to {other.name} [{formatComma(other.health)}/{formatComma(other.maxHealth)} HP] ')
-
-    other.health-=damage
-    
-    if (not other.alive()):
-        player.exp+=other.level * 50
-        if other.name != 'Dummy' and player.name!= 'Dummy':
-            print("")
-            lineWriter(f'{other.name}: {deathQuotes(other)}',0.05)
-            time.sleep(0.25)
-            lineWriter(f'{other.name} has fallen\n',0.1)
-            lineWriter(f'{player.name} gains {formatComma(other.level*50)} exp!' )
-        player.levelup()
-        other.killer = player
 #Combat between two people
 def combat(fighter1,fighter2):
     x = 0
@@ -253,8 +273,8 @@ def combat(fighter1,fighter2):
 
     while fighter1.health > 0 and fighter2.health > 0:
         if fighter1.name != 'Dummy' and fighter2.name!= 'Dummy':
-            lineWriter(f'\n>Turn {turn}\n')
-        attack(fighter1,fighter2,turn)
+            lineWriter(f'\nTurn {turn}\n')
+        fighter1.attack(fighter2,turn)
         print("")
         time.sleep(x)
         if fighter2.health <= 0:
@@ -263,7 +283,7 @@ def combat(fighter1,fighter2):
             # if fighter1.name != 'Dummy' and fighter2.name!= 'Dummy':
             #     print("\n")
             return fighter1
-        attack(fighter2,fighter1,turn)
+        fighter2.attack(fighter1,turn)
         print("")
         time.sleep(x)
         if fighter1.health <= 0:
@@ -318,7 +338,6 @@ def tournament(fighters):
                 return eliminated
             lineWriter(f"Up next: Level {formatComma(fighters[0].level)} {fighters[0].name} vs Level {formatComma(fighters[1].level)} {fighters[1].name}\n")
             time.sleep(5)
-
 #Main function
 def main():
     os.system('cls')
@@ -347,8 +366,4 @@ def main():
     if standings != 0:
         printStats(standings)
     return
-
 main()
-
-
-
