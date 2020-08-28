@@ -59,7 +59,7 @@ class player:
             damage = round(abs(damage*2))
         if other.dodge():
             if other.name != 'Dummy' and player.name!= 'Dummy':
-                lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.0025)
+                lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.05)
                 lineWriter(f'{other.name} dodges a{criticalCheck(criticalHit)} strike from {player.name}')
                 time.sleep(0.5)
             if used == True and player.primary.durability<=0:
@@ -192,7 +192,7 @@ def levelAdd(fighters,levelDesired):
             x-=50
             addExp([fighter],x,levelDesired)
 
-def lineWriter(text,delay = 0.004,noLine = False):
+def lineWriter(text,delay = 0.012,noLine = False):
     for letter in text:
         print(letter,end='')
         sys.stdout.flush()
@@ -201,7 +201,7 @@ def lineWriter(text,delay = 0.004,noLine = False):
         print("")    
 def printStats(fighters):
     for fighter in fighters:
-        lineWriter(str(fighter))
+        lineWriter(str(fighter),0.006)
 def formatComma(number):
     return "{:,}".format(number)
 def characterCreation():
@@ -213,8 +213,8 @@ def characterCreation():
         if x =='tester':
             creators.append(player("Nirojan"))
             creators.append(player("Dev"))
-            # creators.append(player("Raghav"))
-            # creators.append(player("Slade"))
+            creators.append(player("Raghav"))
+            creators.append(player("Slade"))
             alphalinewriter(["Adding Nirojan","Adding Dev","Adding Raghav","Adding Slade"])
             for x in creators:
                 x.addItem(item("Phoenix Slayer",50,50,1))
@@ -222,13 +222,12 @@ def characterCreation():
                 x.addItem(item("Excalibur",100,100,1))
                 x.addItem(item("Sniper",200,60,1))
             print("")
-            time.sleep(4)
             return creators
         else:
             if x !='stop' and x!=' ':
                 x = player(x)
                 creators.append(x)
-                #lineWriter(str(x))
+                #lineWriter(str(x),0.0001)
     return creators
 def teamCreation(name,fighters):
     levels = 0
@@ -310,7 +309,7 @@ def tournament(fighters):
         start = rounds
         if rounds == 1:
             for y in fighters:
-                lineWriter(str(y),0.001)
+                lineWriter(str(y),0.006)
             time.sleep(1)
             lineWriter("Let the games begin...\n",0.064)
             time.sleep(2)
