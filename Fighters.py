@@ -87,12 +87,7 @@ class player:
     def critical(self,other):
         x = [True,False,False,False,False,False,False,False]
         if self.level-other.level >= 10:
-            x.pop(-1)
-            x.pop(-1)
-            x.pop(-1)
-            x.pop(-1)
-            x.pop(-1)
-            x.pop(-1)
+            return True
         x = random.choice(x)
         return x 
     def dodge(self):
@@ -366,4 +361,9 @@ def main():
     if standings != 0:
         printStats(standings)
     return
-main()
+#main()
+x = player("Nirojan")
+y = player("X")
+
+levelAdd([x],11)
+combat(x,y)
