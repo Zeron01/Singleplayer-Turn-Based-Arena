@@ -207,10 +207,10 @@ def characterCreation():
         x = input(">")
         if x =='tester':
             creators.append(player("Nirojan"))
-            creators.append(player("Dev"))
-            creators.append(player("Raghav"))
-            creators.append(player("Slade"))
-            alphalinewriter(["Adding Nirojan","Adding Dev","Adding Raghav","Adding Slade"])
+            creators.append(player("Navneet"))
+            creators.append(player("Himanshu"))
+            creators.append(player("Anantbir"))
+            alphalinewriter(["Adding Nirojan","Adding Navneet","Adding Himanshu","Adding Anantbir"])
             for x in creators:
                 x.addItem(item("Phoenix Slayer",50,50,1))
                 x.addItem(item("Shotgun",20,50,1))
@@ -361,9 +361,4 @@ def main():
     if standings != 0:
         printStats(standings)
     return
-#main()
-x = player("Nirojan")
-y = player("X")
-
-levelAdd([x],11)
-combat(x,y)
+main()
