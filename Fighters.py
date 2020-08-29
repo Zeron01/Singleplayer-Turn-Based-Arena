@@ -184,14 +184,7 @@ def characterCreation():
     while x != 'stop' and len(creators)<32:
         x = input(">")
         if x =='tester':
-            creators.append(player("Nirojan"))
-            creators.append(player("Navneet"))
-            creators.append(player("Himanshu"))
-            creators.append(player("Anantbir"))
-            creators.append(player("Manav"))
-            creators.append(player("Liam"))
-            creators.append(player("Inder"))
-            creators.append(player("Daksham"))
+            creators = [player("Nirojan"),player("Navneet"),player("Himanshu"),player("Anantbir"),player("Manav"),player("Liam"),player("Inder"),player("Daksham")]
             alphalinewriter(["Adding Nirojan","Adding Navneet","Adding Himanshu","Adding Anantbir","Adding Manav","Adding Liam","Adding Inder","Adding Daksham"])
             for x in creators:
                 x.addItem(item("Phoenix Slayer",50,50,1))
@@ -204,7 +197,6 @@ def characterCreation():
             if x !='stop' and x!=' ':
                 x = player(x)
                 creators.append(x)
-                #lineWriter(str(x),0.0001)
     return creators
 def teamCreation(name,fighters):
     levels = 0
