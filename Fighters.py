@@ -49,11 +49,10 @@ class player:
                         time.sleep(0.5)
                 damage = player.primary.use(player)
                 used = True
-        
         damage += ((player.level*15)-other.defense) + (random.randint(1,5*player.level))
         if player.critical(other):
             if other.name != 'Dummy' and player.name!= 'Dummy':
-                lineWriter(f'{player.name}: {criticalQuotes(player)}',0.05)
+                lineWriter(f'{player.name}: {criticalQuotes(player)}',0.035)
                 time.sleep(0.5)
             criticalHit = True
             damage = round(abs(damage*2))
@@ -71,7 +70,8 @@ class player:
             lineWriter(f'[{formatComma(player.health)}/{formatComma(player.maxHealth)} HP] {player.name} deals {formatComma(damage)}{criticalCheck(criticalHit)} damage to {other.name} [{formatComma(other.health)}/{formatComma(other.maxHealth)} HP] ')
 
         other.health-=damage
-        
+        if used == True and player.primary.durability<=0:
+            lineWriter(f'{self.name}\'s {self.primary.name} has been broken...',0.032)   
         if (not other.alive()):
             player.exp+=other.level * 50+50
             if other.name != 'Dummy' and player.name!= 'Dummy':
@@ -82,8 +82,6 @@ class player:
                 lineWriter(f'{player.name} gains {formatComma(other.level*50+50)} exp!' )
             player.levelup()
             other.killer = player
-        if used == True and player.primary.durability<=0:
-            lineWriter(f'{self.name}\'s {self.primary.name} has been broken...',0.032)
     def critical(self,other):
         x = [True,False,False,False,False,False,False,False]
         if self.level-other.level >= 10:
@@ -176,16 +174,13 @@ def grindLvl(fighters):
             #     time.sleep(0.5)
             recoverAll([fighter])
     return fighters
-def addExp(fighters,exp,level):
-    for fighter in fighters:
-        fighter.exp+=exp
-        fighter.levelup(level)
 def levelAdd(fighters,levelDesired):
     if levelDesired>=1:
         for fighter in fighters:
             x = round(50*(levelDesired*(levelDesired+1)/2))
             x-=50
-            addExp([fighter],x,levelDesired)
+            fighter.exp+=x
+            fighter.levelup(levelDesired)
 
 def lineWriter(text,delay = 0.012,noLine = False):
     for letter in text:
@@ -208,8 +203,12 @@ def characterCreation():
         if x =='tester':
             creators.append(player("Nirojan"))
             creators.append(player("Navneet"))
-            creators.append(player("Himanshu"))
-            creators.append(player("Anantbir"))
+            # creators.append(player("Himanshu"))
+            # creators.append(player("Anantbir"))
+            # creators.append(player("Manav"))
+            # creators.append(player("Liam"))
+            # creators.append(player("Inder"))
+            # creators.append(player("Daksham"))
             alphalinewriter(["Adding Nirojan","Adding Navneet","Adding Himanshu","Adding Anantbir"])
             for x in creators:
                 x.addItem(item("Phoenix Slayer",50,50,1))
@@ -297,19 +296,20 @@ def tournament(fighters):
         print("Currently not compatiable with numbers that are not of the second power")
         return 0
     winners = []
-    y = 0
+    matches = 1
     rounds = 1
     eliminated = []
     while True:
         start = rounds
         if rounds == 1:
-            for y in fighters:
-                lineWriter(str(y),0.006)
+            #for y in fighters:
+                #lineWriter(str(y),0.006)
             time.sleep(1)
             lineWriter("Let the games begin...\n",0.064)
             time.sleep(2)
             os.system('cls')
         lineWriter(f"Round {rounds}\n")
+        matches+=standings(fighters,matches)
         while start == rounds:
             fighter1 = fighters[0]
             fighter2 = fighters[1]
@@ -333,6 +333,18 @@ def tournament(fighters):
                 return eliminated
             lineWriter(f"Up next: Level {formatComma(fighters[0].level)} {fighters[0].name} vs Level {formatComma(fighters[1].level)} {fighters[1].name}\n")
             time.sleep(5)
+def standings(fighters,matches):
+    x=0
+    match = matches
+    while x<=len(fighters)-1:
+        lineWriter(f'|Match {match}: {fighters[x].name} vs. {fighters[x+1].name}|')
+        time.sleep(0.5)
+        x+=2
+        match+=1
+    time.sleep(2)
+    print("\n")
+    return match-1
+
 #Main function
 def main():
     os.system('cls')
