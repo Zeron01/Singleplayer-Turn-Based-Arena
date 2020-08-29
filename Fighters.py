@@ -58,7 +58,7 @@ class player:
             damage = round(abs(damage*2))
         if other.dodge():
             if other.name != 'Dummy' and player.name!= 'Dummy':
-                lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.05)
+                lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.017)
                 lineWriter(f'{other.name} dodges a{criticalCheck(criticalHit)} strike from {player.name}')
                 time.sleep(0.5)
             if used == True and player.primary.durability<=0:
