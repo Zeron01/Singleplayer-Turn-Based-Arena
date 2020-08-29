@@ -219,13 +219,7 @@ def criticalQuotes(player):
         return random.choice(["ZA WARUDO","ROAD A ROLLAR DAH","WRYYYYY","KISAMAAAAA","Ohoho, you dare approach me?","Hinjaku! Hinjaku!","It Was me, Dio!","Muda! Muda! Muda! Muda! Muda!","Good bye Jojo"])
     elif player.name == 'Jotaro':
         return random.choice(['Yare yare daze',"STAR PLATIUNUM","Here's your receipt","Your crime can't be paid with money","JAGARS"])
-    dialogue = [
-    "One of us has to die...","You will not live to see another day","I'll keep it simple",
-    "Pick a god and pray...","I didn't want to do this...","You're already dead.","I promise you won't leave in one piece",
-    "Don't waste my time.","I'll promise a swift death","Any last words?","Pay with your life","You're not worth my time",
-    "Start booking your funeral","I'll send you to hell","Just so you know, this isn't personal",
-    "Nothing personal kid","Don't take this personal","I'll make this quick","No one to save you now","Losing my patience",
-    "Pathetic","It didn't have to be this way"]
+    dialogue = ["One of us has to die...","You will not live to see another day","I'll keep it simple","Pick a god and pray...","I didn't want to do this...","You're already dead.","I promise you won't leave in one piece","Don't waste my time.","I'll promise a swift death","Any last words?","Pay with your life","You're not worth my time","Start booking your funeral","I'll send you to hell","Just so you know, this isn't personal","Nothing personal kid","Don't take this personal","I'll make this quick","No one to save you now","Losing my patience","Pathetic","It didn't have to be this way"]
     return random.choice(dialogue)
 def criticalCheck(check):
     if check == True:
