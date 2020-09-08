@@ -184,8 +184,7 @@ def characterCreation():
     while x != 'stop' and len(creators)<32:
         x = input(">")
         if x =='tester':
-            creators = [player("Nirojan"),player("Navneet"),player("Himanshu"),player("Anantbir"),player("Manav"),player("Liam"),player("Inder"),player("Daksham")]
-            alphalinewriter(["Adding Nirojan","Adding Navneet","Adding Himanshu","Adding Anantbir","Adding Manav","Adding Liam","Adding Inder","Adding Daksham"])
+            creators = [player("Nirojan"),player("Raghav"),player("Dev"),player("Slade")]
             for x in creators:
                 x.addItem(item("Phoenix Slayer",50,50,1))
                 x.addItem(item("Shotgun",20,50,1))
