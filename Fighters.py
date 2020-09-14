@@ -184,7 +184,7 @@ def characterCreation():
     while x != 'stop' and len(creators)<32:
         x = input(">")
         if x =='tester':
-            creators = [player("Nirojan"),player("Raghav"),player("Dev"),player("Slade")]
+            creators = [player("Himanshu"),player("Inder"),player("Navneet"),player("Anantbir")]
             for x in creators:
                 x.addItem(item("Phoenix Slayer",50,50,1))
                 x.addItem(item("Shotgun",20,50,1))
