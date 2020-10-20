@@ -34,7 +34,7 @@ class player:
             self.exp -= self.expMax
             self.expMax+=50
             self.defense+=5
-    def attack(self,other,turn):
+    def attack(self,other,turn=-1):
         player = self
         lineWriter(f'->[{player.name}\'s turn]<-\n')
         time.sleep(0.45)
@@ -177,7 +177,7 @@ def printStats(fighters):
         lineWriter(str(fighter),0.006)
 def formatComma(number):
     return "{:,}".format(number)
-def characterCreation():
+def characterCreation(setting = 0):
     creators = []
     x = ''
     print("Enter your fighters names (Type 'stop' to stop)")
@@ -197,7 +197,7 @@ def characterCreation():
                 x = player(x)
                 creators.append(x)
                 continue
-        if(len(creators)<=1 or not math.log(len(creators), 2).is_integer()):
+        if((len(creators)<=1 or not math.log(len(creators), 2).is_integer()) and setting==0):
             x = 2
             while(len(creators)>=x):
                 x*=2
@@ -326,4 +326,8 @@ def main():
     if standings != 0:
         printStats(standings)
     return
-main()
+#main()
+x = characterCreation(1)
+x[0].attack(x[1])
+
+
