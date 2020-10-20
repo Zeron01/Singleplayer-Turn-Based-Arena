@@ -34,7 +34,7 @@ class player:
             self.exp -= self.expMax
             self.expMax+=50
             self.defense+=5
-    def attack(self,other,turn=-1):
+    def attack(self,other,turn=1):
         player = self
         lineWriter(f'->[{player.name}\'s turn]<-\n')
         time.sleep(0.45)
@@ -327,7 +327,10 @@ def main():
         printStats(standings)
     return
 #main()
-x = characterCreation(1)
-x[0].attack(x[1])
+
+fighters = characterCreation()
+combat(fighters[0],fighters[1])
+print(f"{fighters[0]}\n{fighters[1]}")
+
 
 
