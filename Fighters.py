@@ -196,6 +196,13 @@ def characterCreation():
             if x !='stop' and x!=' ':
                 x = player(x)
                 creators.append(x)
+                continue
+        if(len(creators)<=1 or not math.log(len(creators), 2).is_integer()):
+            x = 2
+            while(len(creators)>=x):
+                x*=2
+            lineWriter(f"Need more players [{x-len(creators)} more] ")
+            x = 0
     return creators
 def teamCreation(name,fighters):
     levels = 0
@@ -247,9 +254,6 @@ def combat(fighter1,fighter2):
     return
 #Tournament Code in powers of 2 only
 def tournament(fighters):
-    if not math.log(len(fighters), 2).is_integer():
-        print("Currently not compatiable with numbers that are not of the second power")
-        return 0
     winners = []
     matches = 1
     rounds = 1
@@ -298,30 +302,25 @@ def standings(fighters,matches):
     time.sleep(2)
     print("\n")
     return matches-1
-
+def levelChoose(fighters):
+    while True:
+        lineWriter('What level would you like to start the fighters?')
+        try:
+            startingLevel = int(input(">"))
+            if startingLevel <1:
+                print("Please enter a valid input")
+            else:
+                levelAdd(fighters,startingLevel)
+                break
+        except:
+            lineWriter("Please enter a valid input")
 #Main function
 def main():
     os.system('cls')
     time.sleep(0.25)
     fighters = characterCreation()
-    if len(fighters) <= 1:
-        lineWriter("Please add more than one player you doofus",0.016)
-        time.sleep(0.5)
-        os.system('cls')
-        main()
-        return
-    else:
-        while True:
-            lineWriter('What level would you like to start the fighters?')
-            try:
-                startingLevel = int(input(">"))
-                if startingLevel <1:
-                    print("Please enter a valid input")
-                else:
-                    levelAdd(fighters,startingLevel)
-                    break
-            except:
-                lineWriter("Please enter a valid input")
+    levelChoose(fighters)
+
     os.system('cls')
     standings = tournament(fighters)
     if standings != 0:
