@@ -27,17 +27,18 @@ class player:
             self.defense=5*self.level
             return
         while self.exp >= self.expMax:
-            print(f'\n{self.name} has leveled up to {formatComma(self.level+1)}') 
+            lineWriter(f'\n{self.name} has leveled up to {formatComma(self.level+1)}') 
             self.level+=1
             self.health = self.level*100
             self.maxHealth = self.health
             self.exp -= self.expMax
             self.expMax+=50
             self.defense+=5
-    def attack(self,other,turn=1):
+    def attack(self,other,turn=1,speed=False):
         player = self
         lineWriter(f'->[{player.name}\'s turn]<-\n')
-        time.sleep(0.45)
+        if(speed == False):
+            time.sleep(0.45)
         
         damage = 0
         criticalHit = False
@@ -46,19 +47,22 @@ class player:
             if player.canUse():
                 if player.primary.durability==player.primary.maxDurability or turn == 1:
                     lineWriter(f'{player.name} equips {player.primary.name} (Damage: {formatComma(player.primary.damage)}, Durability: {formatComma(player.primary.durability)}/{formatComma(player.primary.maxDurability)})')
-                    time.sleep(0.5)
+                    if(speed == False):
+                        time.sleep(0.5)
                 damage = player.primary.use(player)
                 used = True
         damage += ((player.level*15)-other.defense) + (random.randint(1,5*player.level))
         if player.critical(other):
             lineWriter(f'{player.name}: {criticalQuotes(player)}',0.035)
-            time.sleep(0.5)
+            if(speed == False):
+                time.sleep(0.5)
             criticalHit = True
             damage = round(abs(damage*2))
         if other.dodge():
             lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.017)
             lineWriter(f'{other.name} dodges a{criticalCheck(criticalHit)} strike from {player.name}')
-            time.sleep(0.5)
+            if(speed == False):
+                time.sleep(0.5)
             if used == True and player.primary.durability<=0:
                 lineWriter(f'{self.name}\'s {self.primary.name} has been broken...',0.032)
             return
@@ -71,9 +75,9 @@ class player:
             lineWriter(f'{self.name}\'s {self.primary.name} has been broken...',0.032)   
         if (not other.alive()):
             player.exp+=other.level * 50+50
-            print("")
-            lineWriter(f'{other.name}: {deathQuotes(other)}',0.05)
-            time.sleep(0.25)
+            lineWriter(f'\n{other.name}: {deathQuotes(other)}',0.05)
+            if(speed == False):
+                time.sleep(0.25)
             lineWriter(f'{other.name} has fallen\n',0.1)
             lineWriter(f'{player.name} gains {formatComma(other.level*50+50)} exp!' )
             player.levelup()
@@ -114,9 +118,9 @@ class player:
             listofItems+=x.isBroken(True)+x.name+', '
         return listofItems[0:len(listofItems)-2]
     def __str__(self):
-        print("\n------------------------------")
+        text=("------------------------------\n")
 
-        text = (f"Profile: {self.name}\n\nLevel: {formatComma(self.level)}\nHealth: {formatComma(self.health)}/{formatComma(self.maxHealth)}\nDefense: {formatComma(self.defense)}\nExp: {formatComma(self.exp)}/{formatComma(self.expMax)}\nWins: {formatComma(self.wins)}\nInventory: [")
+        text += (f"Profile: {self.name}\n\nLevel: {formatComma(self.level)}\nHealth: {formatComma(self.health)}/{formatComma(self.maxHealth)}\nDefense: {formatComma(self.defense)}\nExp: {formatComma(self.exp)}/{formatComma(self.expMax)}\nWins: {formatComma(self.wins)}\nInventory: [")
         if self.hasItem():
             text+=self.listItems()
         text+=']\n'
@@ -166,12 +170,14 @@ def levelAdd(fighters,levelDesired):
             fighter.levelup(levelDesired)
 
 def lineWriter(text,delay = 0.012,noLine = False):
+    # delay =0
     for letter in text:
         print(letter,end='')
         sys.stdout.flush()
         time.sleep(delay)
     if noLine ==False:
-        print("")    
+        print("")
+
 def printStats(fighters):
     for fighter in fighters:
         lineWriter(str(fighter),0.006)
@@ -181,10 +187,14 @@ def characterCreation(setting = 0):
     creators = []
     x = ''
     print("Enter your fighters names (Type 'stop' to stop)")
-    while x != 'stop' and len(creators)<32:
+    while x != 'stop':
         x = input(">")
+        if(len(x) == 0):
+            lineWriter("Please enter something")
+            continue
         if x =='tester':
             creators = [player("Himanshu"),player("Inder"),player("Navneet"),player("Anantbir")]
+            
             for x in creators:
                 x.addItem(item("Phoenix Slayer",50,50,1))
                 x.addItem(item("Shotgun",20,50,1))
@@ -192,16 +202,17 @@ def characterCreation(setting = 0):
                 x.addItem(item("Sniper",200,60,1))
             print("")
             return creators
+        elif(x=="numbers"):
+            for y in range(0,65536):
+                creators.append(player(str(y)))
+            return creators
         else:
             if x !='stop' and x!=' ':
                 x = player(x)
                 creators.append(x)
                 continue
-        if((len(creators)<=1 or not math.log(len(creators), 2).is_integer()) and setting==0):
-            x = 2
-            while(len(creators)>=x):
-                x*=2
-            lineWriter(f"Need more players [{x-len(creators)} more] ")
+        if((len(creators)<=1)):
+            lineWriter(f"[Need at least 2 players] ")
             x = 0
     return creators
 def teamCreation(name,fighters):
@@ -231,29 +242,33 @@ def dodgeQuotes(player):
     dialogue = ["You fool","Not even close", "Too slow", "I saw that from a mile away","You think that was going to hit me??","Miss me with that?","PIKACHU USE DODGE","was that ur best?","even my grandma could dodge that","you call that an attack?","are you even trying to hurt me?","Please...like that would ever hit me",f"I can be {random.choice(['sleeping','blind','crippled','disabled','knocked out','drunk','chained'])} and you still can't hit me"]
     return random.choice(dialogue)  
 #Combat between two people
-def combat(fighter1,fighter2):
+def combat(fighter1,fighter2,fast = False):
+    if(fast == False):
+        speed = 0.45
+    else:
+        speed=0
     if (fighter1 == fighter2):
         return
     turn = 1
     lineWriter(f'[{fighter1.name} vs. {fighter2.name}]')
     while fighter1.health > 0 and fighter2.health > 0:
         lineWriter(f'\nTurn {turn}\n')
-        fighter1.attack(fighter2,turn)
+        fighter1.attack(fighter2,turn,fast)
         print("")
-        time.sleep(0.5)
+        time.sleep(speed)
         if fighter2.health <= 0:
             fighter1.wins+=1
             return fighter1
-        fighter2.attack(fighter1,turn)
+        fighter2.attack(fighter1,turn,fast)
         print("")
-        time.sleep(0.5)
+        time.sleep(speed)
         if fighter1.health <= 0:
             fighter2.wins+=1
             return fighter2
         turn+=1
     return
-#Tournament Code in powers of 2 only
-def tournament(fighters):
+#Tournament Code
+def tournament(fighters,fast=False):
     winners = []
     matches = 1
     rounds = 1
@@ -261,18 +276,35 @@ def tournament(fighters):
     while True:
         start = rounds
         if rounds == 1:
-            for y in fighters:
-                lineWriter(str(y),0.006)
+            # for y in fighters:
+            #     lineWriter(str(y),0.006)
+            if((len(fighters)<=1 or not math.log(len(fighters), 2).is_integer())):
+                names = ""
+                x = 2
+                while(len(fighters)>=x):
+                    x*=2
+                byes = x - len(fighters)
+                for y in range(0,byes):
+                    ahead = (fighters.pop(0))
+                    names+=ahead.name+", "
+                    winners.append(ahead)
+                names+="will progress to round two due to byes"
+                lineWriter(names)
             time.sleep(1)
-            lineWriter("Let the games begin...\n",0.064)
+            lineWriter("\nLet the games begin...\n",0.064)
             time.sleep(2)
             os.system('cls')
         lineWriter(f"Round {rounds}\n")
-        matches+=standings(fighters,matches)
+        if(fast == True):
+            speed = 0
+        else:
+            speed = 0.5
+        matches+=standings(fighters,matches,speed)
         while start == rounds:
             fighter1 = fighters[0]
             fighter2 = fighters[1]
-            winner = combat(fighter1,fighter2)
+            #You can change speed by changing true for speed, false for default
+            winner = combat(fighter1,fighter2,fast)
             winners.append(winner)
             if fighter1 != winner:
                 eliminated.append(fighter1)
@@ -291,15 +323,17 @@ def tournament(fighters):
                 eliminated.append(winners[0])
                 return eliminated
             lineWriter(f"Up next: Level {formatComma(fighters[0].level)} {fighters[0].name} vs Level {formatComma(fighters[1].level)} {fighters[1].name}\n")
-            time.sleep(5)
-def standings(fighters,matches):
+            if (fast==False):
+                time.sleep(3)
+def standings(fighters,matches,speed = 0.5):
     x=0
     while x<=len(fighters)-1:
         lineWriter(f'|Match {matches}: {fighters[x].name} vs. {fighters[x+1].name}|')
-        time.sleep(0.5)
+        time.sleep(speed)
         x+=2
         matches+=1
-    time.sleep(2)
+    speed*=4
+    time.sleep(speed)
     print("\n")
     return matches-1
 def levelChoose(fighters):
@@ -320,17 +354,12 @@ def main():
     time.sleep(0.25)
     fighters = characterCreation()
     levelChoose(fighters)
-
     os.system('cls')
-    standings = tournament(fighters)
-    if standings != 0:
-        printStats(standings)
+    standings = tournament(fighters,False)
+    printStats(standings)
     return
-#main()
+main()
 
-fighters = characterCreation()
-combat(fighters[0],fighters[1])
-print(f"{fighters[0]}\n{fighters[1]}")
 
 
 
