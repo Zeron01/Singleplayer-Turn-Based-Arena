@@ -17,7 +17,7 @@ class player:
         self.defense = defense
         self.killer = "None"
         self.primary = item("Nothing",0,0)
-    def levelup(self,addlevel=1):
+    def levelup(self,addlevel=1,display = True):
         if addlevel!=1:
             self.expMax = 50 *(addlevel+1)
             self.level = addlevel
@@ -27,7 +27,8 @@ class player:
             self.defense=5*self.level
             return
         while self.exp >= self.expMax:
-            lineWriter(f'\n{self.name} has leveled up to {formatComma(self.level+1)}') 
+            if display == True:
+                lineWriter(f'\n{self.name} has leveled up to {formatComma(self.level+1)}') 
             self.level+=1
             self.health = self.level*100
             self.maxHealth = self.health
@@ -170,7 +171,7 @@ def levelAdd(fighters,levelDesired):
             fighter.levelup(levelDesired)
 
 def lineWriter(text,delay = 0.012,noLine = False):
-    # delay =0
+    #delay =0
     for letter in text:
         print(letter,end='')
         sys.stdout.flush()
@@ -183,7 +184,7 @@ def printStats(fighters):
         lineWriter(str(fighter),0.006)
 def formatComma(number):
     return "{:,}".format(number)
-def characterCreation(setting = 0):
+def characterCreation():
     creators = []
     x = ''
     print("Enter your fighters names (Type 'stop' to stop)")
@@ -193,7 +194,7 @@ def characterCreation(setting = 0):
             lineWriter("Please enter something")
             continue
         if x =='tester':
-            creators = [player("Himanshu"),player("Inder"),player("Navneet"),player("Anantbir")]
+            creators = [player("Himanshu"),player("Inder"),player("Navneet"),player("Anantbir"),player("Aayush"),player("Ibra"),player("Liam"),player("Yuvin"),player("Janakan"),player("Manav"),player("Sabby"),player("Daksham"),player("Nusarath"),player("Amtul"),player("Ronak"),player("Vidit")]
             
             for x in creators:
                 x.addItem(item("Phoenix Slayer",50,50,1))
@@ -224,10 +225,6 @@ def teamCreation(name,fighters):
 
 #Various quotes depending on the damage/death/dodge rates
 def criticalQuotes(player):
-    if player.name == 'Dio':
-        return random.choice(["ZA WARUDO","ROAD A ROLLAR DAH","WRYYYYY","KISAMAAAAA","Ohoho, you dare approach me?","Hinjaku! Hinjaku!","It Was me, Dio!","Muda! Muda! Muda! Muda! Muda!","Good bye Jojo"])
-    elif player.name == 'Jotaro':
-        return random.choice(['Yare yare daze',"STAR PLATIUNUM","Here's your receipt","Your crime can't be paid with money","JAGARS"])
     dialogue = ["One of us has to die...","You will not live to see another day","I'll keep it simple","Pick a god and pray...","I didn't want to do this...","You're already dead.","I promise you won't leave in one piece","Don't waste my time.","I'll promise a swift death","Any last words?","Pay with your life","You're not worth my time","Start booking your funeral","I'll send you to hell","Just so you know, this isn't personal","Nothing personal kid","Don't take this personal","I'll make this quick","No one to save you now","Losing my patience","Pathetic","It didn't have to be this way"]
     return random.choice(dialogue)
 def criticalCheck(check):
@@ -276,8 +273,6 @@ def tournament(fighters,fast=False):
     while True:
         start = rounds
         if rounds == 1:
-            # for y in fighters:
-            #     lineWriter(str(y),0.006)
             if((len(fighters)<=1 or not math.log(len(fighters), 2).is_integer())):
                 names = ""
                 x = 2
@@ -286,6 +281,8 @@ def tournament(fighters,fast=False):
                 byes = x - len(fighters)
                 for y in range(0,byes):
                     ahead = (fighters.pop(0))
+                    ahead.exp = ahead.expMax
+                    ahead.levelup(1,False)
                     names+=ahead.name+", "
                     winners.append(ahead)
                 names+="will progress to round two due to byes"
@@ -355,7 +352,8 @@ def main():
     fighters = characterCreation()
     levelChoose(fighters)
     os.system('cls')
-    standings = tournament(fighters,False)
+    #can add true to make it run faster
+    standings = tournament(fighters)
     printStats(standings)
     return
 main()
