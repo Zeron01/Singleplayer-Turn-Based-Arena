@@ -3,7 +3,7 @@ import time
 import sys
 import os
 import math
-from doublelinecode import alphalinewriter
+
 class player:
     def __init__(self,name,health = 100,level = 1, exp = 0,expMax = 100,defense = 0):
         self.name = name
@@ -84,13 +84,13 @@ class player:
             player.levelup()
             other.killer = player
     def critical(self,other):
-        x = [True,False,False,False,False,False,False,False]
+        x = [True,False,False,False,False,False,False,False] #1/8 chance of landing a critical
         if self.level-other.level >= 10:
-            return True
+            return True #If the difference of level is greater than/equal to 10, 100% critical chance
         x = random.choice(x)
         return x 
     def dodge(self):
-        x = random.choice([True,False,False,False,False,False,False,False])
+        x = random.choice([True,False,False,False,False,False,False,False]) #1/8 chance of dodging
         return x
     def alive(self):
         if self.health <=0:
@@ -133,6 +133,7 @@ class player:
             text+=alivetext
         text+=("\n------------------------------")
         return text
+
 class item:
     def __init__(self,name="None",damage=0,durability=0,lvlReq=1):
         self.name = name
@@ -157,7 +158,6 @@ class item:
         return False
     def repairItem(self):
         self.durability = self.maxDurability
-
 #Level and General code
 def recoverAll(aftermath):
     for players in aftermath:
@@ -170,8 +170,7 @@ def levelAdd(fighters,levelDesired):
             fighter.exp+=x
             fighter.levelup(levelDesired)
 
-def lineWriter(text,delay = 0.012,noLine = False):
-    #delay =0
+def lineWriter(text,delay = 0.006,noLine = False):
     for letter in text:
         print(letter,end='')
         sys.stdout.flush()
@@ -197,10 +196,10 @@ def characterCreation():
             creators = [player("Himanshu"),player("Inder"),player("Navneet"),player("Anantbir"),player("Aayush"),player("Ibra"),player("Liam"),player("Yuvin"),player("Janakan"),player("Manav"),player("Sabby"),player("Daksham"),player("Nusarath"),player("Amtul"),player("Ronak"),player("Vidit")]
             
             for x in creators:
-                x.addItem(item("Phoenix Slayer",50,50,1))
-                x.addItem(item("Shotgun",20,50,1))
-                x.addItem(item("Excalibur",100,100,1))
-                x.addItem(item("Sniper",200,60,1))
+                x.addItem(item("Phoenix Slayer",50,50,5))
+                x.addItem(item("Shotgun",20,50,5))
+                x.addItem(item("Excalibur",100,100,5))
+                x.addItem(item("Sniper",200,60,5))
             print("")
             return creators
         elif(x=="numbers"):
@@ -236,7 +235,7 @@ def deathQuotes(player):
     dialogue = ["Not like this","NOOOOOOOOOOO","Impossible....","I...I never thought you'd be this good...","To end... like this?","What? Huh? What's happening?","NO! No, no, no!","No, no, no... I can't die like this",f"I'm sorry{random.choice([' mother...',' father...'])}","Why now....?","I was so close","I failed my family...","Goodbye...","..."]
     return random.choice(dialogue)
 def dodgeQuotes(player):
-    dialogue = ["You fool","Not even close", "Too slow", "I saw that from a mile away","You think that was going to hit me??","Miss me with that?","PIKACHU USE DODGE","was that ur best?","even my grandma could dodge that","you call that an attack?","are you even trying to hurt me?","Please...like that would ever hit me",f"I can be {random.choice(['sleeping','blind','crippled','disabled','knocked out','drunk','chained'])} and you still can't hit me"]
+    dialogue = ["You fool","Not even close", "Too slow", "I saw that from a mile away","You think that was going to hit me??","Miss me with that?","PIKACHU USE DODGE","was that ur best?","even my grandma could dodge that","you call that an attack?","are you even trying to hurt me?","Please...like that would ever hit me",f"I can be {random.choice(['sleeping','knocked out','chained'])} and you still can't hit me"]
     return random.choice(dialogue)  
 #Combat between two people
 def combat(fighter1,fighter2,fast = False):
@@ -281,13 +280,15 @@ def tournament(fighters,fast=False):
                 byes = x - len(fighters)
                 for y in range(0,byes):
                     ahead = (fighters.pop(0))
-                    ahead.exp = ahead.expMax
+                    ahead.exp = ahead.expMax #This will make sure it will be a fair battle for those in the 2nd round
                     ahead.levelup(1,False)
                     names+=ahead.name+", "
                     winners.append(ahead)
                 names+="will progress to round two due to byes"
                 lineWriter(names)
             time.sleep(1)
+            lineWriter("Players will start with all the stats similar to this player")
+            lineWriter(str(fighters[0]))
             lineWriter("\nLet the games begin...\n",0.064)
             time.sleep(2)
             os.system('cls')
@@ -326,7 +327,6 @@ def standings(fighters,matches,speed = 0.5):
     x=0
     while x<=len(fighters)-1:
         lineWriter(f'|Match {matches}: {fighters[x].name} vs. {fighters[x+1].name}|')
-        time.sleep(speed)
         x+=2
         matches+=1
     speed*=4
@@ -352,7 +352,6 @@ def main():
     fighters = characterCreation()
     levelChoose(fighters)
     os.system('cls')
-    #can add true to make it run faster
     standings = tournament(fighters)
     printStats(standings)
     return
