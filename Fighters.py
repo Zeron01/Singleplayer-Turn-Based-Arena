@@ -50,17 +50,17 @@ class player:
                     lineWriter(f'{player.name} equips {player.primary.name} (Damage: {formatComma(player.primary.damage)}, Durability: {formatComma(player.primary.durability)}/{formatComma(player.primary.maxDurability)})')
                     if(speed == False):
                         time.sleep(0.5)
-                damage = player.primary.use(player)
+                damage = round(player.primary.use(player)*(player.level)*0.25)
                 used = True
         damage += ((player.level*15)-other.defense) + (random.randint(1,5*player.level))
         if player.critical(other):
-            lineWriter(f'{player.name}: {criticalQuotes(player)}',0.035)
+            lineWriter(f'{player.name}: {criticalQuotes()}',0.035)
             if(speed == False):
                 time.sleep(0.5)
             criticalHit = True
             damage = round(abs(damage*2))
         if other.dodge():
-            lineWriter(f'{other.name}: {dodgeQuotes(other)}',0.017)
+            lineWriter(f'{other.name}: {dodgeQuotes()}',0.017)
             lineWriter(f'{other.name} dodges a{criticalCheck(criticalHit)} strike from {player.name}')
             if(speed == False):
                 time.sleep(0.5)
@@ -76,7 +76,7 @@ class player:
             lineWriter(f'{self.name}\'s {self.primary.name} has been broken...',0.032)   
         if (not other.alive()):
             player.exp+=other.level * 50+50
-            lineWriter(f'\n{other.name}: {deathQuotes(other)}',0.05)
+            lineWriter(f'\n{other.name}: {deathQuotes()}',0.05)
             if(speed == False):
                 time.sleep(0.25)
             lineWriter(f'{other.name} has fallen\n',0.1)
@@ -185,6 +185,13 @@ def formatComma(number):
     return "{:,}".format(number)
 def characterCreation():
     creators = []
+    #lvl 5 at least to try these weapons
+    items = [
+        item("Steel Sword", 80, 150, 5),
+        item("Legendary Sword", 120, 200, 5), 
+        item("Shotgun",95,150,5),
+        item("Legendary Sniper",120,150,5),
+    ]
     x = ''
     print("Enter your fighters names (Type 'stop' to stop)")
     while x != 'stop':
@@ -192,23 +199,10 @@ def characterCreation():
         if(len(x) == 0):
             lineWriter("Please enter something")
             continue
-        if x =='tester':
-            creators = [player("Himanshu"),player("Inder"),player("Navneet"),player("Anantbir"),player("Aayush"),player("Ibra"),player("Liam"),player("Yuvin"),player("Janakan"),player("Manav"),player("Sabby"),player("Daksham"),player("Nusarath"),player("Amtul"),player("Ronak"),player("Vidit")]
-            
-            for x in creators:
-                x.addItem(item("Phoenix Slayer",50,50,5))
-                x.addItem(item("Shotgun",20,50,5))
-                x.addItem(item("Excalibur",100,100,5))
-                x.addItem(item("Sniper",200,60,5))
-            print("")
-            return creators
-        elif(x=="numbers"):
-            for y in range(0,65536):
-                creators.append(player(str(y)))
-            return creators
         else:
             if x !='stop' and x!=' ':
                 x = player(x)
+                x.addItem(random.choice(items))
                 creators.append(x)
                 continue
         if((len(creators)<=1)):
@@ -223,19 +217,71 @@ def teamCreation(name,fighters):
 #Combat code
 
 #Various quotes depending on the damage/death/dodge rates
-def criticalQuotes(player):
-    dialogue = ["One of us has to die...","You will not live to see another day","I'll keep it simple","Pick a god and pray...","I didn't want to do this...","You're already dead.","I promise you won't leave in one piece","Don't waste my time.","I'll promise a swift death","Any last words?","Pay with your life","You're not worth my time","Start booking your funeral","I'll send you to hell","Just so you know, this isn't personal","Nothing personal kid","Don't take this personal","I'll make this quick","No one to save you now","Losing my patience","Pathetic","It didn't have to be this way"]
+def criticalQuotes():
+    dialogue = [
+        "One of us has to die...",
+        "You will not live to see another day",
+        "I'll keep it simple",
+        "Pick a god and pray...",
+        "I didn't want to do this...",
+        "You're already dead.",
+        "I promise you won't leave in one piece",
+        "Don't waste my time.",
+        "I'll promise a swift death",
+        "Any last words?",
+        "Pay with your life",
+        "You're not worth my time",
+        "Start booking your funeral",
+        "I'll send you to hell",
+        "Just so you know, this isn't personal",
+        "Nothing personal kid",
+        "Don't take this personal",
+        "I'll make this quick",
+        "No one to save you now",
+        "Losing my patience",
+        "Pathetic",
+        "It didn't have to be this way"
+        ]
     return random.choice(dialogue)
 def criticalCheck(check):
     if check == True:
         return ' critical'
     else:
         return ''
-def deathQuotes(player):
-    dialogue = ["Not like this","NOOOOOOOOOOO","Impossible....","I...I never thought you'd be this good...","To end... like this?","What? Huh? What's happening?","NO! No, no, no!","No, no, no... I can't die like this",f"I'm sorry{random.choice([' mother...',' father...'])}","Why now....?","I was so close","I failed my family...","Goodbye...","..."]
+def deathQuotes():
+    dialogue = [
+        "Not like this",
+        "NOOOOOOOOOOO",
+        "Impossible....",
+        "I...I never thought you'd be this good...",
+        "To end... like this?",
+        "What? Huh? What's happening?",
+        "NO! No, no, no!",
+        "No, no, no... I can't die like this",
+        f"I'm sorry{random.choice([' mother...',' father...'])}",
+        "Why now....?",
+        "I was so close",
+        "I failed my family...",
+        "Goodbye...",
+        "..."
+        ]
     return random.choice(dialogue)
-def dodgeQuotes(player):
-    dialogue = ["You fool","Not even close", "Too slow", "I saw that from a mile away","You think that was going to hit me??","Miss me with that?","PIKACHU USE DODGE","was that ur best?","even my grandma could dodge that","you call that an attack?","are you even trying to hurt me?","Please...like that would ever hit me",f"I can be {random.choice(['sleeping','knocked out','chained'])} and you still can't hit me"]
+def dodgeQuotes():
+    dialogue = [
+        "You fool",
+        "Not even close", 
+        "Too slow", 
+        "I saw that from a mile away",
+        "You think that was going to hit me??",
+        "Miss me with that?",
+        "PIKACHU USE DODGE",
+        "was that ur best?",
+        "even my grandma could dodge that",
+        "you call that an attack?",
+        "are you even trying to hurt me?",
+        "Please...like that would ever hit me",
+        f"I can be {random.choice(['sleeping','knocked out','chained'])} and you still can't hit me"
+        ]
     return random.choice(dialogue)  
 #Combat between two people
 def combat(fighter1,fighter2,fast = False):
@@ -278,7 +324,7 @@ def tournament(fighters,fast=False):
                 while(len(fighters)>=x):
                     x*=2
                 byes = x - len(fighters)
-                for y in range(0,byes):
+                for _ in range(0,byes):
                     ahead = (fighters.pop(0))
                     ahead.exp = ahead.expMax #This will make sure it will be a fair battle for those in the 2nd round
                     ahead.levelup(1,False)
@@ -345,14 +391,29 @@ def levelChoose(fighters):
                 break
         except:
             lineWriter("Please enter a valid input")
+def speedUpGame():
+    while True:
+        lineWriter('Would you like to speed up the games? (y/n)')
+        try:
+            speed = input(">")
+            if speed =="y":
+                return True
+            elif speed=="n":
+                return False
+            else:
+                lineWriter('Enter valid choice please')
+        except Exception:
+            lineWriter("Please enter a valid input")
+
 #Main function
 def main():
     os.system('cls')
     time.sleep(0.25)
     fighters = characterCreation()
     levelChoose(fighters)
+    speed = speedUpGame()
     os.system('cls')
-    standings = tournament(fighters)
+    standings = tournament(fighters, speed)
     printStats(standings)
     return
 main()
